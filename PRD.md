@@ -2,7 +2,7 @@
 
 ## Aplikasi Manajemen Rumah Makan (Tatafy)
 
-**Versi Dokumen:** 2.0**Tanggal:** 30 Oktober 2025**Penyusun:**
+**Versi Dokumen:** 2.0**Tanggal:** 4 November 2025**Penyusun:**
 
 - Muhamad Azkal Fahmi Yahya (221240001336)
 - Khaf Sari Inayati (221240001228)
@@ -180,6 +180,7 @@ Mengembangkan aplikasi manajemen rumah makan berbasis mobile yang **100% offline
    - Grafik kategori penjualan (Pie Chart)
    - Filter periode (Hari Ini, 7 Hari, Bulan, Tahun)
    - Export PDF & Excel
+   - Offline Backup & Restore (tanpa internet)
 8. **Financial Dashboard**
 
    - Payment Methods Dashboard
@@ -611,6 +612,22 @@ Laporan penjualan komprehensif dengan visualisasi data.
   - PDF (comprehensive report)
   - Excel (detailed data)
   - Share file
+
+### 3.8 Offline Backup & Restore (Cross-Device)
+
+**Prioritas:** P0 (Critical)  
+**Status:** ✅ Implemented (Offline-First)
+
+**Deskripsi singkat:** Cadangkan data secara lokal dan pulihkan di perangkat lain tanpa internet. Saat login di HP baru, pengguna dapat mengimpor file backup untuk melanjutkan semua data lama (cross-device restore) dengan konfirmasi 2 langkah.
+
+**Cakupan:**
+- Backup lokal manual ke penyimpanan perangkat dengan penamaan otomatis.
+- Import/restore dari file backup lokal di perangkat lain setelah login.
+- Validasi kompatibilitas versi skema sebelum restore; tampilkan panduan jika tidak cocok.
+
+**Di luar cakupan (saat ini):** Cloud sync/backup otomatis; enkripsi file backup (direncanakan sebagai peningkatan keamanan).
+
+**Keberhasilan:** ≥80% pengguna aktif membuat ≥1 backup/minggu; waktu restore <3 menit.
 
 **Manfaat:**
 
@@ -1478,6 +1495,18 @@ App Shell
 
   - Properties: `timestamp`, `query_type`, `query_time_ms`
 
+### 6.4 Alur Offline Backup & Restore
+
+1) Backup (Manual):
+- Settings → Export & Backup → "Buat Backup Offline" → pilih lokasi → simpan file `*.db`.
+- Tampilkan notifikasi sukses dan opsi "Buka Folder" atau "Bagikan".
+
+2) Restore (Manual):
+- Settings → Export & Backup → "Pulihkan dari Backup" → pilih file `*.db` → verifikasi versi skema → konfirmasi 2 langkah → proses restore → aplikasi dimuat ulang.
+
+3) Pengingat Backup Lokal (opsional):
+- Pengingat mingguan untuk melakukan backup manual agar data rutin tersimpan.
+
 ### 7.2 Metrics Collection
 
 #### 7.2.1 Daily Metrics
@@ -1710,290 +1739,3 @@ Features di masa depan akan diprioritaskan berdasarkan:
 2. **Business Value** - Apakah fitur ini meningkatkan value proposition
 3. **Technical Feasibility** - Apakah feasible untuk diimplementasi
 4. **Resource Required** - Berapa banyak effort yang dibutuhkan
-
----
-
-## 9. Asumsi, Batasan, dan Ketergantungan
-
-### 9.1 Asumsi (Assumptions)
-
-#### 9.1.1 Asumsi Teknis
-
-1. **Platform Support**
-
-   - Android adalah platform primary target (80%+ users di Indonesia)
-   - iOS support adalah secondary priority
-   - Desktop platforms (Windows, Linux, macOS) adalah nice-to-have
-2. **Device Capabilities**
-
-   - Device memiliki minimal 2GB RAM
-   - Storage cukup untuk database lokal (estimasi 10-50MB per restoran)
-   - Device memiliki kamera untuk foto menu (optional)
-   - Device support SQLite natively
-3. **User Technical Literacy**
-
-   - User familiar dengan smartphone dasar (bisa pakai WhatsApp, dll)
-   - User tidak perlu pengetahuan teknis untuk menggunakan aplikasi
-   - Training minimal diperlukan (maksimal 30 menit)
-4. **Usage Patterns**
-
-   - Satu device per restoran (atau satu user account per restoran)
-   - Offline-first usage (tidak selalu ada internet)
-   - Usage intensif (multiple transactions per hari)
-   - Data akan bertambah seiring waktu (perlu optimasi untuk dataset besar)
-
-#### 9.1.2 Asumsi Bisnis
-
-1. **Market Acceptance**
-
-   - Ada demand untuk solusi offline-first di pasar
-   - Price point gratis/freemium acceptable untuk market
-   - User akan melihat value dari sistem yang integrated
-2. **User Behavior**
-
-   - User akan menggunakan fitur utama (POS, Inventory, Reports)
-   - User akan melakukan stock opname secara berkala
-   - User akan maintain recipe untuk semua menu (ideal case)
-3. **Competition**
-
-   - Tidak akan ada competitor besar yang masuk market dengan solusi serupa dalam 6 bulan pertama
-   - Existing solutions (Moka, Odoo, dll) terlalu mahal untuk target market
-
-#### 9.1.3 Asumsi Akademik
-
-1. **Timeline**
-
-   - Proyek harus selesai sebelum UAS
-   - UAT dapat dilakukan dalam 2-3 minggu
-   - Tidak ada major blocker yang tidak terduga
-2. **Resources**
-
-   - Tim development cukup untuk maintain dan improve aplikasi
-   - Budget terbatas untuk marketing dan infrastructure
-
-### 9.2 Batasan (Constraints)
-
-#### 9.2.1 Teknis
-
-1. **Database Limitations**
-
-   - SQLite memiliki limit ukuran database (max 140TB, tapi praktis <1GB untuk performance)
-   - SQLite concurrent writes terbatas (satu writer at a time)
-   - Tidak support advanced SQL features seperti stored procedures
-2. **Platform Limitations**
-
-   - Flutter Web masih memiliki beberapa limitations
-   - Print functionality terbatas (perlu printer support)
-   - Camera access memerlukan permissions yang mungkin ditolak user
-3. **Offline Limitations**
-
-   - Tidak ada real-time sync antar devices
-   - Tidak ada cloud backup otomatis (kecuali diimplementasi)
-   - Conflict resolution untuk multi-device editing tidak ada
-4. **Performance**
-
-   - Query bisa lambat jika database sangat besar (>10,000 transactions)
-   - Image loading bisa lambat jika banyak foto menu high-resolution
-   - UI bisa lag jika terlalu banyak widgets di screen
-
-#### 9.2.2 Fungsional
-
-1. **Feature Limitations**
-
-   - Tidak ada multi-user concurrent access (untuk MVP)
-   - Tidak ada advanced accounting (hanya basic reports)
-   - Tidak ada integration dengan external systems (untuk MVP)
-   - Tidak ada real-time notifications
-2. **Data Limitations**
-
-   - Tidak ada historical data migration dari sistem lain
-   - Tidak ada import/export format standar (CSV, dll) - hanya custom format
-   - Tidak ada data validation terhadap external sources
-
-#### 9.2.3 Bisnis
-
-1. **Marketing Constraints**
-
-   - Budget marketing terbatas (academic project)
-   - Tidak ada dedicated sales team
-   - Relies on word-of-mouth dan organic growth
-2. **Support Constraints**
-
-   - Support terbatas (tidak ada 24/7 support)
-   - Documentation mungkin tidak lengkap untuk semua edge cases
-   - Update dan bug fixes mengikuti timeline academic
-
-#### 9.2.4 Regulasi & Legal
-
-1. **Data Privacy**
-
-   - Belum ada privacy policy formal (perlu untuk production)
-   - Tidak ada GDPR compliance (jika expand ke EU)
-   - Data stored locally, tapi perlu inform user tentang data handling
-2. **Business Registration**
-
-   - Aplikasi ini untuk academic purpose, belum ada business entity formal
-   - Monetization future perlu legal structure
-
-### 9.3 Ketergantungan (Dependencies)
-
-#### 9.3.1 Teknis
-
-1. **Flutter Framework**
-
-   - Ketergantungan pada Flutter SDK updates
-   - Ketergantungan pada third-party packages:
-     - `sqflite` untuk database
-     - `provider` untuk state management
-     - `fl_chart` untuk charts
-     - `pdf`, `excel` untuk export
-     - Dan 20+ packages lainnya
-   - Jika package deprecated atau tidak maintain, perlu mencari alternatif
-2. **Platform Dependencies**
-
-   - Android: Minimum SDK 21 (Android 5.0)
-   - iOS: Minimum iOS 12.0
-   - Perlu update jika platform minimum requirements berubah
-3. **Device Dependencies**
-
-   - SQLite support dari OS
-   - File system access untuk export/backup
-   - Camera access untuk foto menu
-   - Print functionality (optional)
-
-#### 9.3.2 External Services (Future)
-
-1. **Cloud Services (Jika implement cloud sync)**
-
-   - Firebase / AWS / Own server
-   - Ketergantungan pada service availability
-   - Cost considerations
-2. **Third-party Integrations (Future)**
-
-   - Payment gateways
-   - Food delivery platforms
-   - Accounting software APIs
-   - Ketergantungan pada API availability dan changes
-
-#### 9.3.3 Tim & Resources
-
-1. **Development Team**
-
-   - Ketergantungan pada availability tim untuk maintenance
-   - Skill set yang diperlukan (Flutter, SQLite, UI/UX)
-2. **Testing Resources**
-
-   - Beta testers untuk UAT
-   - Devices untuk testing (various screen sizes, OS versions)
-3. **Documentation**
-
-   - User manual creation
-   - Technical documentation untuk future developers
-
-#### 9.3.4 Academic Dependencies
-
-1. **Timeline**
-
-   - UAS schedule
-   - Academic calendar
-   - Review process timeline
-2. **Academic Requirements**
-
-   - Approval dari dosen pembimbing
-   - Presentation schedule
-   - Documentation requirements
-
-### 9.4 Risk Mitigation
-
-#### 9.4.1 Technical Risks
-
-**Risk:** Package deprecated atau tidak compatible dengan Flutter update**Mitigation:**
-
-- Regular dependency updates
-- Monitor package health
-- Maintain list of alternatives
-
-**Risk:** Database corruption atau data loss**Mitigation:**
-
-- Regular backup feature
-- Database integrity checks
-- Transaction rollback on errors
-
-**Risk:** Performance degradation dengan large dataset**Mitigation:**
-
-- Implement pagination
-- Database indexing
-- Query optimization
-- Data archiving strategy (future)
-
-#### 9.4.2 Business Risks
-
-**Risk:** Low user adoption**Mitigation:**
-
-- Focus on user onboarding experience
-- Provide sample data for easy start
-- Clear value proposition
-- Word-of-mouth marketing
-
-**Risk:** Competition from established players**Mitigation:**
-
-- Focus on unique value (offline-first, affordable)
-- Quick iteration based on feedback
-- Build community around product
-
-#### 9.4.3 Academic Risks
-
-**Risk:** Timeline tidak mencukupi**Mitigation:**
-
-- Prioritize MVP features
-- Agile development dengan frequent reviews
-- Buffer time untuk unexpected issues
-
-**Risk:** UAT tidak berjalan sesuai rencana**Mitigation:**
-
-- Early recruitment of beta testers
-- Clear UAT guidelines
-- Backup plan untuk data collection
-
----
-
-## APPENDIX
-
-### A. Glosarium
-
-- **POS**: Point of Sale - Sistem kasir untuk transaksi
-- **MVP**: Minimum Viable Product - Produk dengan fitur minimal yang layak
-- **SQLite**: Database SQL lokal yang embedded di aplikasi
-- **COGS**: Cost of Goods Sold - Harga pokok penjualan
-- **PPN**: Pajak Pertambahan Nilai
-- **Stock Opname**: Proses penghitungan fisik stok
-- **UAT**: User Acceptance Testing - Pengujian oleh pengguna
-
-### B. Referensi
-
-- Flutter Documentation: https://flutter.dev/docs
-- SQLite Documentation: https://www.sqlite.org/docs.html
-- Material Design 3: https://m3.material.io/
-
-### C. Changelog
-
-**Version 2.0 (30 Oktober 2025)**
-
-- Complete rewrite sesuai struktur PRD standar
-- Penambahan 9 bagian utama sesuai requirement
-- Detail user personas dan user stories
-- Comprehensive analytics plan
-- Future work roadmap
-
-**Version 1.1 (30 Oktober 2025)**
-
-- Update PRD dengan status development
-- Penambahan status build dan next steps
-
-**Version 1.0 (Awal Oktober 2025)**
-
-- Initial PRD creation
-
----
-
-**Dokumen ini adalah living document dan akan di-update seiring perkembangan proyek.**
